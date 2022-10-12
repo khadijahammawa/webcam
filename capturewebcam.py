@@ -1,76 +1,57 @@
-import time
+import os
+
 import cv2
-from cv2 import VideoCapture, VideoWriter_fourcc, VideoWriter
-print('packages imported')
+import pandas as pd
+from cv2 import VideoCapture, VideoWriter, VideoWriter_fourcc, waitKey
 
-flag_debug = 0
-SUBJ_ID = 123 #PARAMS.subject_code
-SESSION_NAME = 'test' #PARAMS.session.name
+params = pd.read_csv('C:/Users/feusn/Desktop/vismodR01/parameters.csv')
 
-print('const variables declared')
+FLAG_DEBUG = 1 #int(params['flag_debug'])
+SUBJ_ID = params['subject_code'][0]
+SESSION_NAME = params['session_name'][0]
 
-def capturewebcam(command):
-    capture = VideoCapture(0)
-    video_code = VideoWriter_fourcc(*'MPEG')
-    width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(capture.get(cv2.CAP_PROP_FPS))
-    output = VideoWriter(f'vismodR01/helper_scripts/sub-{SUBJ_ID}_task-{SESSION_NAME}_webcam.avi', video_code, fps, (width, height))     
-    # open preview window
-    if flag_debug:
-        ret,frame = capture.read()
-        cv2.imshow("Debug Camera Test", frame)
-        cv2.waitKey(5000)
-    print('camera init')
-    # create video capture object to capture the video from our webcam
-    #if command == 'Initialize':
-        #capture = VideoCapture(0)
-        #video_code = VideoWriter_fourcc(*'MPEG')
-        #width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-        #height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        #fps = int(capture.get(cv2.CAP_PROP_FPS))
-        #output = VideoWriter(f'vismodR01/helper_scripts/sub-{SUBJ_ID}_task-{SESSION_NAME}_webcam.avi', video_code, fps, (width, height))     
-        # open preview window
-        #if flag_debug:
-            #ret,frame = capture.read()
-            #cv2.imshow("Debug Camera Test", frame)
-            #cv2.waitKey(5000)
-    print('camera recording')
-    if command == 'StartRecording':
-        while(True):
-            # Capture each frame of webcam video
-            ret,frame = capture.read()
-            #cv2.imshow("My cam video", frame)
-            output.write(frame)
-            if flag_debug:
-            # Close and break the loop after pressing "x" key (debug purposes)
-                if cv2.waitKey(1) &0XFF == ord('x'):
-                    break
+
+# This will return video from the first webcam on your computer.
+capture = VideoCapture(0)
+
+# Variables to create videowriter object
+width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+fps = fps = int(capture.get(cv2.CAP_PROP_FPS))
+vidpath = f'C:/Users/feusn/Desktop/vismodR01/sub-{SUBJ_ID}_task_{SESSION_NAME}_webcam.avi'
+
+# Define the codec and create VideoWriter object
+fourcc = VideoWriter_fourcc(*'XVID')
+output = VideoWriter(vidpath, fourcc, fps, (width, height))
+
+# loop runs if capturing has been initialized.
+while(True):
+    # Capture each frame of webcam video
+    # ret checks return at each frame
+    ret,frame = capture.read()
     
-    if command == 'StopRecording':
-        print('recording stopped')
-        # close the already opened camera
-        capture.release()
-        # close the already opened file
-        output.release()
-        # close the window and de-allocate anay asssociated memory usage
-        cv2.destroyAllWindows()
+    # output the frame
+    output.write(frame)
+    
+    # input frame is shown in the window
+    cv2.imshow("webcam video", frame)
 
-    if command == 'Properties':
-        print("CAP_PROP_FPS : '{}'".format(capture.get(cv2.CAP_PROP_FPS)))
-        print("CAP_PROP_POS_MSEC : '{}'".format(capture.get(cv2.CAP_PROP_POS_MSEC)))
-        print("CAP_PROP_FRAME_COUNT  : '{}'".format(capture.get(cv2.CAP_PROP_FRAME_COUNT)))
-        print("CAP_PROP_BRIGHTNESS : '{}'".format(capture.get(cv2.CAP_PROP_BRIGHTNESS)))
-        print("CAP_PROP_CONTRAST : '{}'".format(capture.get(cv2.CAP_PROP_CONTRAST)))
-        print("CAP_PROP_SATURATION : '{}'".format(capture.get(cv2.CAP_PROP_SATURATION)))
-        print("CAP_PROP_HUE : '{}'".format(capture.get(cv2.CAP_PROP_HUE)))
-        print("CAP_PROP_GAIN  : '{}'".format(capture.get(cv2.CAP_PROP_GAIN)))
-        print("CAP_PROP_CONVERT_RGB : '{}'".format(capture.get(cv2.CAP_PROP_CONVERT_RGB)))
+    # Close and break the loop after pressing "x" key
+    if cv2.waitKey(1) &0XFF == ord('x'):
+        break
 
-    return output
+# close the already opened camera
+capture.release()
+# close the already opened file
+output.release()
+# close the window and de-allocate anay asssociated memory usage
+cv2.destroyAllWindows()
 
-#init = capturewebcam('Initialize')
-capturewebcam('StartRecording')
-capturewebcam('StopRecording')
-capturewebcam('Properties')
-print('video captured and saved')
+#if FLAG_DEBUG == 1:
+    #print("FPS : '{}'".format(capture.get(cv2.CAP_PROP_FPS)))
+    #print("POS_MSEC : '{}'".format(capture.get(cv2.CAP_PROP_POS_MSEC)))
+    #print("FRAME_COUNT  : '{}'".format(capture.get(cv2.CAP_PROP_FRAME_COUNT)))
+    #print("BRIGHTNESS : '{}'".format(capture.get(cv2.CAP_PROP_BRIGHTNESS)))
+    #print("CONTRAST : '{}'".format(capture.get(cv2.CAP_PROP_CONTRAST)))
+    #print("SATURATION : '{}'".format(capture.get(cv2.CAP_PROP_SATURATION)))
+    #print("HUE : '{}'".format(capture.get(cv2.CAP_PROP_HUE)))
