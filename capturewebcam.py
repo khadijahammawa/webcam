@@ -3,6 +3,7 @@ import os
 import cv2
 import pandas as pd
 from cv2 import VideoCapture, VideoWriter, VideoWriter_fourcc, waitKey
+import psutil
 
 params = pd.read_csv('C:/Users/feusn/Desktop/vismodR01/parameters.csv')
 
@@ -29,6 +30,9 @@ while(True):
     # Capture each frame of webcam video
     # ret checks return at each frame
     ret,frame = capture.read()
+
+    #if "eyelink" not in (p.name() for p in psutil.process_iter()):
+        #break
     
     # output the frame
     output.write(frame)
